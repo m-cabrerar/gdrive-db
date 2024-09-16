@@ -74,6 +74,8 @@ def test02_store_files():
     mocked_iterator = google_lib.FileIterator(mocked_service)
 
     db = gdrive_db.DriveDB("postgresql://user:password@db:5432/test", "test")
+    borrar_tabla(db, "privacy_history")
+    borrar_tabla(db, "files")
     db.create_files_table("files")
     db.create_privacy_history_table("privacy_history", "files")
 
@@ -111,6 +113,10 @@ def test02_store_files():
         print_test_result("test@test.test", result[3], "file3 owner stored")
         print_test_result("PRIVATE", result[4], "file3 visibility stored")
         print_test_result(datetime.datetime(2021, 1, 3, 0, 0), result[5], "file3 last modified stored")
+    
+    # Cleanup
+    borrar_tabla(db, "privacy_history")
+    borrar_tabla(db, "files")
 
 def test03_make_private():
     print(bcolors.HEADER + "Test 03: Make file private" + bcolors.ENDC)
@@ -144,6 +150,9 @@ def test04_mail_notify():
     mocked_service.users().messages().send.assert_called_once()
     print_test_result(True, mocked_service.users().messages().send.called, "Mail sent")
                                                                 
+def borrar_tabla(db, table):
+    with db.engine.connect() as connection:
+        connection.execute(text(f"DROP TABLE IF EXISTS {table}"))
 
 
 def run_all():
