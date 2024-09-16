@@ -9,6 +9,7 @@ import tests
 
 # Create Flask app
 app = Flask(__name__)
+app.secret_key = os.urandom(24)
 
 FILES_TABLE = "files"
 PRIVACY_HISTORY_TABLE = "privacy_history"
