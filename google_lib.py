@@ -54,7 +54,7 @@ def build_services(credentials):
 
 class FileIterator:
     def __init__(self, service):
-        """Initialize with the Google Drive service object and setup pagination."""
+        """ Initialize with the Google Drive service object and setup pagination. """
         self.service = service
         self.files = []
         self.page_token = None
@@ -62,7 +62,7 @@ class FileIterator:
         self._fetch_next_page()
 
     def _fetch_next_page(self):
-        """Fetch the next page of files from My Drive."""
+        """ Fetch the next page of files from My Drive. """
         response = self.service.files().list(
             q="trashed = false",
             spaces='drive',
@@ -76,11 +76,11 @@ class FileIterator:
         self.current_index = 0  # Reset index for the new page
 
     def has_next(self):
-        """Return whether there are more files to iterate over."""
+        """ Return whether there are more files to iterate over. """
         return self.current_index < len(self.files) or self.page_token is not None
 
     def next_file(self):
-        """Return the next file, fetching new pages if needed."""
+        """ Return the next file, fetching new pages if needed. """
         if self.current_index >= len(self.files):
             if self.page_token:
                 self._fetch_next_page()
@@ -94,9 +94,11 @@ class FileIterator:
         return None
     
 def file_is_public(file):
+    """ Check if a file is public. """
     return not file["permissions"] or any(permission["type"] == "anyone" for permission in file["permissions"])
 
 def make_private(service, file):
+    """ Make a file private if the user has the permission. """
     if not file["permissions"]: 
         return False
 
@@ -110,6 +112,7 @@ def make_private(service, file):
         return False
     
 def mail_notify(service, files, owner):
+    """ Send an email notification to the file owner listing the files that were made private. """
     files_str = "<br>".join([f'{file["name"]} ({file["id"]})' for file in files])
     user_mail = service.users().getProfile(userId='me').execute()['emailAddress']
     message_body = f"""Hello, 

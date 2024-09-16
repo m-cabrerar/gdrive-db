@@ -3,6 +3,9 @@ from sqlalchemy_utils import database_exists, create_database
 import google_lib
 
 def process_files(file_iterator, db, privated_files, service_gdrive):
+    """ Iterates over files. 
+    If a file is public, makes it private. 
+    Stores or updates all files in the database. """
     files = []
     while file_iterator.has_next():
         file = file_iterator.next_file()
@@ -21,10 +24,12 @@ def process_files(file_iterator, db, privated_files, service_gdrive):
     return files
 
 def notify_owners(service_gmail, privated_files):
+    """ Notifies the owners of the files that were made private. """
     for owner, files in privated_files.items():
         google_lib.mail_notify(service_gmail, files, owner)
 
 class DriveDB:
+    """ Class to interact with the database. """
     def __init__(self, DB_URL, DB_NAME):
         self.engine = create_engine(DB_URL, isolation_level="AUTOCOMMIT")
         if not database_exists(self.engine.url):
@@ -35,6 +40,7 @@ class DriveDB:
         self.privacy_history_table = ""
 
     def create_files_table(self, table_name):
+        """ Creates the table to store the files. """
         with self.engine.connect() as connection:
             connection.execute(text("CREATE TABLE IF NOT EXISTS " + table_name
                                     + " (id VARCHAR(255) PRIMARY KEY NOT NULL, "
@@ -47,6 +53,7 @@ class DriveDB:
             self.files_table = table_name
 
     def insert_file(self, file):
+        """ Inserts or updates a file in the database. """
         extension = file['name'].split('.')[-1] if '.' in file['name'] else None
         name = file['name'].replace("." + extension, '') if extension else file['name']
         owner = file['owners'][0]['emailAddress'] if file['owners'] else None
@@ -68,6 +75,7 @@ class DriveDB:
                                         + f"'{file['visibility']}', '{file['modifiedTime']}')"))
 
     def create_privacy_history_table(self, table_name, files_table):
+        """ Creates the table to store the privacy history of the files. """
         with self.engine.connect() as connection:
             connection.execute(text("CREATE TABLE IF NOT EXISTS " + table_name
                                     + " (file_id VARCHAR(255) PRIMARY KEY NOT NULL, "
@@ -77,6 +85,7 @@ class DriveDB:
             self.privacy_history_table = table_name
 
     def insert_privacy_history(self, file_id):
+        """ Inserts or updates the privacy history of a file in the database. """
         with self.engine.connect() as connection:
             result = connection.execute(text(f"SELECT * FROM {self.privacy_history_table} WHERE file_id = '{file_id}'"))
             if result.rowcount > 0:
