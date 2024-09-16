@@ -1,6 +1,8 @@
 # GDrive-DB
 GDrive-DB es un aplicación para inventariar en una Base de Datos todos los archivos pertenecientes a la unidad de Drive de un usuario, y asegurar su privacidad. \
-Al utilizar la aplicación, el usuario obtendrá una base de datos con la información de los archivos en su drive y cuándo fue la ultima vez que se detectó visibilidad pública para los mismos. Además, la aplicación privatizará cualquier archivo público al que el usuario tenga permisos suficientes para hacerlo y le enviará un mail al owner.
+Al utilizar la aplicación, el usuario obtendrá una base de datos con la información de los archivos en su drive y cuándo fue la ultima vez que se detectó visibilidad pública para los mismos. Además, la aplicación privatizará cualquier archivo público al que el usuario tenga permisos suficientes para hacerlo y le enviará un mail al owner.\
+Las notificaciones serán enviadas a cada owner por el total de sus archivos que sufrieron cambios, no por cada uno. Esto fue pensado para evitar el envío de demasiados correos y posiblemente 
+ser automáticamente marcados como spam.
 
 ## Diagrama de flujo
 ![Diagrama de flujo](flow_chart.png)
