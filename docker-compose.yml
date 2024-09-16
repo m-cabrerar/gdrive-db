@@ -1,0 +1,25 @@
+services:
+  db:
+    env_file: .env
+    image: postgres:15
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: ${DATABASE_NAME}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+
+  app:
+    env_file: .env
+    build: .
+    depends_on:
+      - db
+    environment:
+      DATABASE_URL: "postgresql://user:password@db:5432/mydatabase"
+    ports:
+      - "5000:5000"
+
+volumes:
+  pgdata:
